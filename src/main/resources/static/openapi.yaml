@@ -1,0 +1,210 @@
+openapi: 3.1.1
+info:
+  title: Workie Workout Service API
+  description: Service to manage Workouts and Exercises
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080/api
+    description: Local server
+
+tags:
+  - name: Exercises
+    description: Exercise related endpoints
+
+paths:
+  /exercises:
+    get:
+      tags:
+        - Exercises
+      summary: List exercises
+      operationId: listExercises
+      x-spring-paginated: true
+      parameters:
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/size"
+        - name: sort
+          in: query
+          description: "Sort order. Only 'name' is a valid sort field. Invalid values default to name,asc."
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - name,asc
+                - name,desc
+        - name: name
+          in: query
+          description: "Case-insensitive partial match on exercise name."
+          schema:
+            type: string
+        - name: movementPatterns
+          in: query
+          description: "Filter by movement pattern. Multiple values are OR-combined."
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ExerciseMovementPattern'
+        - name: targetMuscleGroups
+          in: query
+          description: "Filter by target muscle group. Exercises targeting any of the provided groups are included. Multiple values are OR-combined."
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ExerciseMuscleGroup'
+        - name: categories
+          in: query
+          description: "Filter by category. Multiple values are OR-combined."
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ExerciseCategory'
+        - name: difficulties
+          in: query
+          description: "Filter by difficulty. Multiple values are OR-combined."
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ExerciseDifficulty'
+      responses:
+        '200':
+          description: Paginated list of exercises
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExercisePage'
+
+components:
+  schemas:
+    ExercisePage:
+      type: object
+      required:
+        - content
+        - totalElements
+        - totalPages
+        - size
+        - number
+        - first
+        - last
+        - empty
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExerciseResponse'
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+        size:
+          type: integer
+        number:
+          type: integer
+        first:
+          type: boolean
+        last:
+          type: boolean
+        numberOfElements:
+          type: integer
+        empty:
+          type: boolean
+
+    ExerciseResponse:
+      type: object
+      required:
+        - id
+        - name
+        - movementPattern
+        - targetMuscleGroups
+        - secondaryMuscleGroups
+        - category
+        - difficulty
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        movementPattern:
+          $ref: '#/components/schemas/ExerciseMovementPattern'
+        targetMuscleGroups:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExerciseMuscleGroup'
+        secondaryMuscleGroups:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExerciseMuscleGroup'
+        category:
+          $ref: '#/components/schemas/ExerciseCategory'
+        difficulty:
+          $ref: '#/components/schemas/ExerciseDifficulty'
+
+    ExerciseMovementPattern:
+      type: string
+      enum:
+        - SQUAT
+        - HINGE
+        - PUSH
+        - PULL
+        - CARRY
+        - LOCOMOTION
+        - ROTATION
+        - BALLISTIC
+        - ISOMETRIC
+
+    ExerciseMuscleGroup:
+      type: string
+      enum:
+        - QUADRICEPS
+        - HAMSTRINGS
+        - GLUTES
+        - ADDUCTORS
+        - CALVES
+        - LOWER_BACK
+        - ABS
+        - OBLIQUES
+        - CHEST
+        - BACK
+        - LATS
+        - SHOULDERS
+        - BICEPS
+        - TRICEPS
+        - FOREARMS
+        - TRAPS
+
+    ExerciseCategory:
+      type: string
+      enum:
+        - STRENGTH
+        - POWER
+        - CONDITIONING
+        - CARDIO
+        - MOBILITY
+        - SKILL
+
+    ExerciseDifficulty:
+      type: string
+      enum:
+        - BEGINNER
+        - INTERMEDIATE
+        - ADVANCED
+
+  parameters:
+    page:
+      name: page
+      in: query
+      description: Zero-based page index
+      schema:
+        type: integer
+        default: 0
+        minimum: 0
+    size:
+      name: size
+      in: query
+      description: Number of items per page
+      schema:
+        type: integer
+        default: 20
+        minimum: 1

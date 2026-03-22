@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: workout-service
+  mvc:
+    servlet:
+      path: /api
+    problemdetails:
+      enabled: true
+  datasource:
+    url: jdbc:postgresql://localhost:5432/workout
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+logging:
+  level:
+    root: WARN
+    org.workie.workout: INFO
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    url: /openapi.yaml
+    enabled: false
