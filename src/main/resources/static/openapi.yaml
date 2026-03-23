@@ -74,6 +74,33 @@ paths:
               schema:
                 $ref: '#/components/schemas/ExercisePage'
 
+  /exercises/{id}:
+    get:
+      tags:
+        - Exercises
+      summary: Get exercise by ID
+      operationId: getExercise
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Exercise found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExerciseResponse'
+        '404':
+          description: Exercise not found
+          content:
+            application/problem+json:
+              schema:
+                type: object
+
 components:
   schemas:
     ExercisePage:

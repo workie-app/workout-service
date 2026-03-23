@@ -1,12 +1,12 @@
 package org.workie.workout.infrastructure.exercise;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.BatchSize;
 import java.util.Set;
 import java.util.UUID;
 import lombok.*;
-import org.workie.workout.domain.exercise.Difficulty;
+import org.hibernate.annotations.BatchSize;
 import org.workie.workout.domain.exercise.Category;
+import org.workie.workout.domain.exercise.Difficulty;
 import org.workie.workout.domain.exercise.MovementPattern;
 import org.workie.workout.domain.exercise.MuscleGroup;
 

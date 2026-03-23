@@ -219,4 +219,23 @@ class ExerciseControllerIT {
         .andExpect(jsonPath("$.content").isArray())
         .andExpect(jsonPath("$.content[0].name").value("IT Exercise A01"));
   }
+
+  @Test
+  void shouldReturnExerciseById() throws Exception {
+    mockMvc
+        .perform(get("/exercises/b0000000-0000-0000-0000-000000000001"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.name").value("IT Exercise A01"))
+        .andExpect(jsonPath("$.movementPattern").value("PUSH"))
+        .andExpect(jsonPath("$.category").value("STRENGTH"))
+        .andExpect(jsonPath("$.difficulty").value("BEGINNER"))
+        .andExpect(jsonPath("$.targetMuscleGroups[0]").value("CHEST"));
+  }
+
+  @Test
+  void shouldReturn404WhenExerciseIdDoesNotExist() throws Exception {
+    mockMvc
+        .perform(get("/exercises/00000000-0000-0000-0000-000000000000"))
+        .andExpect(status().isNotFound());
+  }
 }

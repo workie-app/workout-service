@@ -10,9 +10,15 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import org.workie.workout.domain.exercise.ExerciseNotFoundException;
 
 @RestControllerAdvice
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
+
+  @ExceptionHandler(ExerciseNotFoundException.class)
+  public ProblemDetail handleExerciseNotFound(ExerciseNotFoundException ex, WebRequest request) {
+    return createProblemDetail(ex, HttpStatus.NOT_FOUND, ex.getMessage(), null, null, request);
+  }
 
   @ExceptionHandler(MethodArgumentTypeMismatchException.class)
   public ProblemDetail handleTypeMismatch(

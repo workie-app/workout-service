@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,12 +19,15 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.workie.workout.api.shared.PageableApiMapper;
+import org.workie.workout.application.exercise.GetExerciseCommand;
+import org.workie.workout.application.exercise.GetExerciseUseCase;
 import org.workie.workout.application.exercise.ListExercisesCommand;
 import org.workie.workout.application.exercise.ListExercisesUseCase;
 import org.workie.workout.domain.exercise.Category;
 import org.workie.workout.domain.exercise.Difficulty;
 import org.workie.workout.domain.exercise.Exercise;
 import org.workie.workout.domain.exercise.ExerciseId;
+import org.workie.workout.domain.exercise.ExerciseNotFoundException;
 import org.workie.workout.domain.exercise.MovementPattern;
 import org.workie.workout.domain.exercise.MuscleGroup;
 import org.workie.workout.domain.shared.DomainPage;
@@ -35,6 +39,7 @@ class ExerciseControllerTest {
   @Autowired private MockMvc mockMvc;
 
   @MockitoBean private ListExercisesUseCase listExercisesUseCase;
+  @MockitoBean private GetExerciseUseCase getExerciseUseCase;
 
   private Exercise exercise(String name) {
     return new Exercise(
@@ -222,5 +227,50 @@ class ExerciseControllerTest {
         .andExpect(jsonPath("$.detail", containsString("ISOMETRI")))
         .andExpect(jsonPath("$.detail", containsString("movementPatterns")))
         .andExpect(jsonPath("$.detail", containsString("ISOMETRIC")));
+  }
+
+  @Test
+  void shouldReturn200WithExerciseWhenFound() throws Exception {
+    ExerciseId id = ExerciseId.generate();
+    Exercise ex = exercise("Bench Press");
+    when(getExerciseUseCase.execute(any())).thenReturn(ex);
+
+    mockMvc
+        .perform(get("/exercises/{id}", id.value()))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.name").value("Bench Press"))
+        .andExpect(jsonPath("$.movementPattern").value("PUSH"))
+        .andExpect(jsonPath("$.category").value("STRENGTH"))
+        .andExpect(jsonPath("$.difficulty").value("INTERMEDIATE"))
+        .andExpect(jsonPath("$.targetMuscleGroups[0]").value("CHEST"));
+  }
+
+  @Test
+  void shouldReturn404WhenExerciseNotFound() throws Exception {
+    ExerciseId id = ExerciseId.generate();
+    when(getExerciseUseCase.execute(any())).thenThrow(new ExerciseNotFoundException(id));
+
+    mockMvc
+        .perform(get("/exercises/{id}", id.value()))
+        .andExpect(status().isNotFound())
+        .andExpect(jsonPath("$.status").value(404));
+  }
+
+  @Test
+  void shouldReturn400WhenIdIsInvalidUuid() throws Exception {
+    mockMvc.perform(get("/exercises/not-a-uuid")).andExpect(status().isBadRequest());
+  }
+
+  @Test
+  void shouldPassCorrectExerciseIdToUseCase() throws Exception {
+    UUID uuid = UUID.randomUUID();
+    ExerciseId expectedId = ExerciseId.of(uuid);
+    when(getExerciseUseCase.execute(any())).thenReturn(exercise("Squat"));
+
+    mockMvc.perform(get("/exercises/{id}", uuid)).andExpect(status().isOk());
+
+    ArgumentCaptor<GetExerciseCommand> captor = ArgumentCaptor.forClass(GetExerciseCommand.class);
+    verify(getExerciseUseCase).execute(captor.capture());
+    assertThat(captor.getValue().exerciseId()).isEqualTo(expectedId);
   }
 }

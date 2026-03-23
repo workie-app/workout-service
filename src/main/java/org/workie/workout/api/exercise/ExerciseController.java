@@ -1,6 +1,7 @@
 package org.workie.workout.api.exercise;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.Nullable;
@@ -12,11 +13,15 @@ import org.workie.workout.api.contract.exercise.ExerciseDifficulty;
 import org.workie.workout.api.contract.exercise.ExerciseMovementPattern;
 import org.workie.workout.api.contract.exercise.ExerciseMuscleGroup;
 import org.workie.workout.api.contract.exercise.ExercisePage;
+import org.workie.workout.api.contract.exercise.ExerciseResponse;
 import org.workie.workout.api.contract.exercise.ExercisesApi;
 import org.workie.workout.api.shared.PageableApiMapper;
+import org.workie.workout.application.exercise.GetExerciseCommand;
+import org.workie.workout.application.exercise.GetExerciseUseCase;
 import org.workie.workout.application.exercise.ListExercisesCommand;
 import org.workie.workout.application.exercise.ListExercisesUseCase;
 import org.workie.workout.domain.exercise.ExerciseFilter;
+import org.workie.workout.domain.exercise.ExerciseId;
 import org.workie.workout.domain.shared.DomainPageable;
 
 @RequiredArgsConstructor
@@ -26,6 +31,7 @@ public class ExerciseController implements ExercisesApi {
   private final PageableApiMapper pageableApiMapper;
   private final ExerciseApiMapper exerciseMapper;
   private final ListExercisesUseCase listExercisesUseCase;
+  private final GetExerciseUseCase getExerciseUseCase;
 
   @Override
   public ResponseEntity<ExercisePage> listExercises(
@@ -46,6 +52,13 @@ public class ExerciseController implements ExercisesApi {
     return ResponseEntity.ok(
         exerciseMapper.toPage(
             listExercisesUseCase.execute(new ListExercisesCommand(filter, domainPageable))));
+  }
+
+  @Override
+  public ResponseEntity<ExerciseResponse> getExercise(UUID id) {
+    return ResponseEntity.ok(
+        exerciseMapper.toResponse(
+            getExerciseUseCase.execute(new GetExerciseCommand(ExerciseId.of(id)))));
   }
 
   private <A, B> List<B> toMapped(@Nullable List<A> input, Function<A, B> mapper) {

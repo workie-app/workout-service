@@ -47,12 +47,13 @@ class ExerciseFilterTest {
 
   @Test
   void shouldPreserveNonEmptyLists() {
-    ExerciseFilter filter = new ExerciseFilter(
-        "bench",
-        List.of(MovementPattern.PUSH),
-        List.of(MuscleGroup.CHEST),
-        List.of(Category.STRENGTH),
-        List.of(Difficulty.INTERMEDIATE));
+    ExerciseFilter filter =
+        new ExerciseFilter(
+            "bench",
+            List.of(MovementPattern.PUSH),
+            List.of(MuscleGroup.CHEST),
+            List.of(Category.STRENGTH),
+            List.of(Difficulty.INTERMEDIATE));
 
     assertThat(filter.movementPatterns()).containsExactly(MovementPattern.PUSH);
     assertThat(filter.targetMuscleGroups()).containsExactly(MuscleGroup.CHEST);

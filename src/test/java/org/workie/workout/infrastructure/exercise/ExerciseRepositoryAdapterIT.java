@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase.Replace.NONE;
 
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
@@ -54,6 +55,29 @@ class ExerciseRepositoryAdapterIT {
   @Test
   void shouldReturnEmptyWhenNotFoundById() {
     assertThat(adapter.findById(ExerciseId.generate())).isEmpty();
+  }
+
+  @Test
+  void shouldReturnExerciseByIdWhenSaved() {
+    Exercise saved =
+        exercise(
+            "FindById Bench Press",
+            MovementPattern.PUSH,
+            List.of(MuscleGroup.CHEST, MuscleGroup.TRICEPS),
+            Category.STRENGTH,
+            Difficulty.INTERMEDIATE);
+    saveAndFlush(saved);
+
+    Optional<Exercise> result = adapter.findById(saved.getId());
+
+    assertThat(result).isPresent();
+    assertThat(result.get().getId()).isEqualTo(saved.getId());
+    assertThat(result.get().getName()).isEqualTo("FindById Bench Press");
+    assertThat(result.get().getMovementPattern()).isEqualTo(MovementPattern.PUSH);
+    assertThat(result.get().getTargetMuscleGroups())
+        .containsExactlyInAnyOrder(MuscleGroup.CHEST, MuscleGroup.TRICEPS);
+    assertThat(result.get().getCategory()).isEqualTo(Category.STRENGTH);
+    assertThat(result.get().getDifficulty()).isEqualTo(Difficulty.INTERMEDIATE);
   }
 
   @Test
@@ -225,8 +249,7 @@ class ExerciseRepositoryAdapterIT {
             Difficulty.INTERMEDIATE);
     saveAndFlush(cardio, strength);
 
-    ExerciseFilter filter =
-        new ExerciseFilter(null, null, null, List.of(Category.CARDIO), null);
+    ExerciseFilter filter = new ExerciseFilter(null, null, null, List.of(Category.CARDIO), null);
     DomainPage<Exercise> page = adapter.findAll(filter, PAGE_ALL);
 
     assertThat(page.content())
@@ -264,8 +287,7 @@ class ExerciseRepositoryAdapterIT {
     saveAndFlush(cardio, strength, mobility);
 
     ExerciseFilter filter =
-        new ExerciseFilter(
-            null, null, null, List.of(Category.CARDIO, Category.STRENGTH), null);
+        new ExerciseFilter(null, null, null, List.of(Category.CARDIO, Category.STRENGTH), null);
     DomainPage<Exercise> page = adapter.findAll(filter, PAGE_ALL);
 
     assertThat(page.content())
@@ -368,11 +390,7 @@ class ExerciseRepositoryAdapterIT {
 
     ExerciseFilter filter =
         new ExerciseFilter(
-            "filter and",
-            List.of(MovementPattern.PUSH),
-            null,
-            List.of(Category.STRENGTH),
-            null);
+            "filter and", List.of(MovementPattern.PUSH), null, List.of(Category.STRENGTH), null);
     DomainPage<Exercise> page = adapter.findAll(filter, PAGE_ALL);
 
     assertThat(page.content())

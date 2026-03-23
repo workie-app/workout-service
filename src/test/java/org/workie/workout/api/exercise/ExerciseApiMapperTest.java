@@ -29,7 +29,8 @@ class ExerciseApiMapperTest {
 
   @Test
   void shouldMapMovementPattern() {
-    assertThat(mapper.toMovementPattern(MovementPattern.PUSH)).isEqualTo(ExerciseMovementPattern.PUSH);
+    assertThat(mapper.toMovementPattern(MovementPattern.PUSH))
+        .isEqualTo(ExerciseMovementPattern.PUSH);
   }
 
   @Test
@@ -59,7 +60,8 @@ class ExerciseApiMapperTest {
 
   @Test
   void shouldMapDifficulty() {
-    assertThat(mapper.toDifficulty(Difficulty.INTERMEDIATE)).isEqualTo(ExerciseDifficulty.INTERMEDIATE);
+    assertThat(mapper.toDifficulty(Difficulty.INTERMEDIATE))
+        .isEqualTo(ExerciseDifficulty.INTERMEDIATE);
   }
 
   @Test
@@ -69,7 +71,8 @@ class ExerciseApiMapperTest {
 
   @Test
   void shouldMapDomainMovementPattern() {
-    assertThat(mapper.toDomainMovementPattern(ExerciseMovementPattern.PULL)).isEqualTo(MovementPattern.PULL);
+    assertThat(mapper.toDomainMovementPattern(ExerciseMovementPattern.PULL))
+        .isEqualTo(MovementPattern.PULL);
   }
 
   @Test
@@ -99,6 +102,7 @@ class ExerciseApiMapperTest {
 
   @Test
   void shouldMapDomainDifficulty() {
-    assertThat(mapper.toDomainDifficulty(ExerciseDifficulty.BEGINNER)).isEqualTo(Difficulty.BEGINNER);
+    assertThat(mapper.toDomainDifficulty(ExerciseDifficulty.BEGINNER))
+        .isEqualTo(Difficulty.BEGINNER);
   }
 }
