@@ -1,0 +1,35 @@
+services:
+
+  workout-service-db:
+    container_name: workout-service-db
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - workout-service-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  workout-service:
+    container_name: workout-service
+    image: workie/workout-service
+    ports:
+      - "8080:8080"
+    environment:
+      DB_URL: jdbc:postgresql://workout-service-db:5432/${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+    depends_on:
+      workout-service-db:
+        condition: service_healthy
+
+volumes:
+  workout-service-db-data:

@@ -168,6 +168,17 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <image>
+                        <name>workie/workout-service:${project.version}</name>
+                        <tags>
+                            <tag>workie/workout-service:latest</tag>
+                        </tags>
+                        <env>
+                            <BP_JVM_VERSION>25</BP_JVM_VERSION>
+                        </env>
+                    </image>
+                </configuration>
             </plugin>
 
             <plugin>

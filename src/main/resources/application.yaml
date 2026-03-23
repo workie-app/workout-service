@@ -7,9 +7,9 @@ spring:
     problemdetails:
       enabled: true
   datasource:
-    url: jdbc:postgresql://localhost:5432/workout
-    username: ${DB_USER}
-    password: ${DB_PASSWORD}
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/workout}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
   jpa:
     hibernate:
       ddl-auto: validate
